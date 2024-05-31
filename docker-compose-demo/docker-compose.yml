@@ -1,0 +1,39 @@
+version: '1.0'
+services:
+# MySQL Database Service
+  mysql: # ServiceName which you want to give.
+    image: mysql:latest
+    container_name: mysql-container
+    ports:
+      - 3308:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: Khanms8853@@
+      MYSQL_DATABASE: docker-db
+    healthcheck:
+        test: [ "CMD","mysqladmin","ping","-h","localhost","-u","root","-pKhanms8853@@"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+    networks:
+      - docker-nw
+  # Spring Boot Application
+  spring-app:
+    #image: docker-compose-demo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-container
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CONFIG_LOCATION: classpath:/application.properties
+    networks:
+      - docker-nw
+    image: puddu6264/docker-compose-demo:latest  # Set your desired image name
+
+networks:
+    docker-nw: #Name of your docker network you want to give
+      driver: bridge
